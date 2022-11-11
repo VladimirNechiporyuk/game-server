@@ -1,0 +1,23 @@
+server:
+  port: 8051
+
+spring:
+  application:
+    name: game-server
+  datasource:
+    url: jdbc:postgresql://localhost:5432/game_server_psql
+    username: postgres
+    password: postgres
+#  jpa:
+#    database: game_server_psql
+#    show-sql: true
+#    generate-ddl: true
+#    properties.hibernate.jdbc.lob.non_contextual_creation: true
+#    datasource:
+#      platform: postgres
+#      url: jdbc:postgresql://localhost:5432/game_server_psql
+#      username: postgres
+#      password: postgres
+  data:
+    mongodb:
+      database: game-server-mongodb
