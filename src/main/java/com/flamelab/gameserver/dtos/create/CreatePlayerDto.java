@@ -1,5 +1,6 @@
 package com.flamelab.gameserver.dtos.create;
 
+import com.flamelab.gameserver.enums.Genders;
 import lombok.*;
 
 @Getter
@@ -11,5 +12,6 @@ import lombok.*;
 public class CreatePlayerDto extends CommonCreateDto {
 
     private String name;
+    private Genders gender;
 
 }

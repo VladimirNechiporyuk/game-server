@@ -4,40 +4,42 @@ import com.flamelab.gameserver.dtos.create.CreatePlayerDto;
 import com.flamelab.gameserver.dtos.transcfer.TransferPlayerDto;
 import com.flamelab.gameserver.dtos.update.UpdatePlayerDto;
 import com.flamelab.gameserver.entities.Player;
-import com.flamelab.gameserver.exceptions.NoExistentEntityException;
-import com.flamelab.gameserver.repositories.PlayersRepository;
 import com.flamelab.gameserver.services.PlayersService;
 import com.flamelab.gameserver.utiles.*;
 import com.flamelab.gameserver.utiles.naming.FieldNames;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+
+import static com.flamelab.gameserver.utiles.naming.DbCollectionNames.PLAYERS__DB_COLLECTION;
+import static com.flamelab.gameserver.utiles.naming.FieldNames.ID__FIELD_APPELLATION;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class PlayersServiceImpl implements PlayersService {
 
-    private final PlayersRepository playersRepository;
     private final MapperUtility<Player, TransferPlayerDto> mapperFromEntityToTransferDto;
     private final MapperUtility<UpdatePlayerDto, Player> mapperFromUpdateDtoToEntity;
+    private final DbEntityUtility<Player> dbEntityUtility;
     private final EntityBuilder<Player, CreatePlayerDto> entityBuilder;
-    private final CopyUtility<Player> copyUtility;
     private final DifferenceUtility<Player> differenceUtility;
     private final ClassUtility<Player> classUtility;
 
     @Override
-    public TransferPlayerDto createEntity(CreatePlayerDto createDto) {
+    public TransferPlayerDto createEntity(CreatePlayerDto createDto, ObjectId armyId) {
         Player playerForSaving;
         playerForSaving = entityBuilder.buildEntityFromDto(createDto, CreatePlayerDto.class, Player.class);
-        playerForSaving.setId(UUID.randomUUID());
+        playerForSaving.setArmyId(armyId);
         return mapperFromEntityToTransferDto.map(
-                playersRepository.save(playerForSaving),
+                dbEntityUtility.saveEntity(
+                        playerForSaving,
+                        Player.class,
+                        PLAYERS__DB_COLLECTION),
                 Player.class,
                 TransferPlayerDto.class
         );
@@ -45,9 +47,10 @@ public class PlayersServiceImpl implements PlayersService {
     }
 
     @Override
-    public TransferPlayerDto getEntityById(UUID id) {
+    public TransferPlayerDto getEntityById(ObjectId id) {
         return mapperFromEntityToTransferDto.map(
-                getPlayerById(id),
+                fetchPlayerById(id),
+//                fetchPlayerByOrThrow(Map.of(ID__FIELD_APPELLATION, id)),
                 Player.class,
                 TransferPlayerDto.class
         );
@@ -56,37 +59,61 @@ public class PlayersServiceImpl implements PlayersService {
     @Override
     public List<TransferPlayerDto> getAllEntities() {
         return mapperFromEntityToTransferDto.mapToList(
-                playersRepository.findAll(),
+                dbEntityUtility.findAllByClass(Player.class, PLAYERS__DB_COLLECTION),
                 Player.class,
                 TransferPlayerDto.class
         );
     }
 
     @Override
-    public TransferPlayerDto updateEntity(UUID id, UpdatePlayerDto updateDto) {
-        Player playerForUpdate = getPlayerById(id);
-        Player playerWithNewData = mapperFromUpdateDtoToEntity.map(updateDto, UpdatePlayerDto.class, Player.class);
-        Map<FieldNames, Object> changes = differenceUtility.getChanges(playerForUpdate, playerWithNewData, Player.class);
-        playerForUpdate = classUtility.setValuesForFields(playerForUpdate, Player.class, changes);
+    public List<String> getAvailableParametersNameOfEntity() {
+        return classUtility.getParameterNames(Player.class);
+    }
+
+    @Override
+    public TransferPlayerDto updateEntityById(ObjectId id, UpdatePlayerDto updatedDto) {
+        Player existingPlayer = fetchPlayerById(id);
+        Player playerWithNewData = mapperFromUpdateDtoToEntity.map(updatedDto, UpdatePlayerDto.class, Player.class);
         return mapperFromEntityToTransferDto.map(
-                playersRepository.save(playerForUpdate),
+                updateProjectData(existingPlayer, playerWithNewData),
                 Player.class,
-                TransferPlayerDto.class
-        );
+                TransferPlayerDto.class);
     }
 
     @Override
-    public void deleteEntityById(UUID id) {
-        playersRepository.deleteById(id);
+    public void deleteEntityById(ObjectId id) {
+        dbEntityUtility.deleteEntityBy(Map.of(ID__FIELD_APPELLATION, id), Player.class, PLAYERS__DB_COLLECTION);
     }
 
-    private Player getPlayerById(UUID id) {
-        Optional<Player> playerByIdOptional = playersRepository.findPlayerById(id);
-        if (playerByIdOptional.isEmpty()) {
-            throw new NoExistentEntityException(String.format("Player with id: '%s' does not exists.", id));
-        } else {
-            return playerByIdOptional.get();
-        }
+    @Override
+    public boolean isPlayerExists(ObjectId playerId) {
+        return dbEntityUtility.isEntityExistsBy(Map.of(ID__FIELD_APPELLATION, playerId), Player.class, PLAYERS__DB_COLLECTION);
+    }
+
+    private Player fetchPlayerByOrThrow(Map<FieldNames, Object> criterias) {
+        return dbEntityUtility.findOneByOrThrow(criterias, Player.class, PLAYERS__DB_COLLECTION);
+    }
+
+    private Player fetchPlayerById(ObjectId id) {
+        return dbEntityUtility.findOneById(id, Player.class, PLAYERS__DB_COLLECTION);
+    }
+
+    private TransferPlayerDto updateEntityBy(Map<FieldNames, Object> criterias, UpdatePlayerDto updatedDto) {
+        Player existingProject = fetchPlayerByOrThrow(criterias);
+        Player projectWithNewData = mapperFromUpdateDtoToEntity.map(updatedDto, UpdatePlayerDto.class, Player.class);
+        return mapperFromEntityToTransferDto.map(
+                updateProjectData(existingProject, projectWithNewData),
+                Player.class,
+                TransferPlayerDto.class);
+    }
+
+    private Player updateProjectData(Player projectForUpdate, Player projectWithNewData) {
+        Map<FieldNames, Object> fieldsWithNewData = differenceUtility.getChanges(projectForUpdate, projectWithNewData, Player.class);
+        return dbEntityUtility.updateEntity(
+                projectForUpdate,
+                Player.class,
+                fieldsWithNewData,
+                PLAYERS__DB_COLLECTION);
     }
 
 }

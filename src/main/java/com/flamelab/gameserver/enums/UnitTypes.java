@@ -1,12 +1,7 @@
 package com.flamelab.gameserver.enums;
 
 public enum UnitTypes {
-    MAGE,
-    SWORDSMAN_IN_HEAVY_ARMOR,
-    SWORDSMAN_IN_LIGHT_ARMOR,
     SPEARMAN_IN_HEAVY_ARMOR,
-    SPEARMAN_IN_LIGHT_ARMOR,
     CAVALRYMAN_IN_HEAVY_ARMOR,
-    CAVALRYMAN_IN_LIGHT_ARMOR,
     BOWMAN
 }

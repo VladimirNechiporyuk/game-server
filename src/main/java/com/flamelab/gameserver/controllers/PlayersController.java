@@ -6,6 +6,7 @@ import com.flamelab.gameserver.dtos.update.UpdatePlayerDto;
 import com.flamelab.gameserver.entities.Player;
 import com.flamelab.gameserver.managers.PlayersManager;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +20,12 @@ public class PlayersController {
     private final PlayersManager playersManager;
 
     @PostMapping
-    public TransferPlayerDto createPlayer(CreatePlayerDto createPlayerDto) {
+    public TransferPlayerDto createPlayer(@RequestBody CreatePlayerDto createPlayerDto) {
         return playersManager.createPlayer(createPlayerDto);
     }
 
     @GetMapping("/{id}")
-    public TransferPlayerDto getPlayerById(@PathVariable("id") UUID playerId) {
+    public TransferPlayerDto getPlayerById(@PathVariable("id") ObjectId playerId) {
         return playersManager.getPlayerById(playerId);
     }
 
@@ -34,12 +35,12 @@ public class PlayersController {
     }
 
     @PutMapping("{id}")
-    public TransferPlayerDto updatePlayer(@PathVariable("id") UUID playerId, UpdatePlayerDto updatePlayerDto) {
+    public TransferPlayerDto updatePlayer(@PathVariable("id") ObjectId playerId, @RequestBody UpdatePlayerDto updatePlayerDto) {
         return playersManager.updatePlayerById(playerId, updatePlayerDto);
     }
 
     @DeleteMapping("{id}")
-    public void deletePlayer(@PathVariable("id") UUID playerId) {
+    public void deletePlayer(@PathVariable("id") ObjectId playerId) {
         playersManager.deletePlayerById(playerId);
     }
 

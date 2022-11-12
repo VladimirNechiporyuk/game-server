@@ -1,4 +1,4 @@
 package com.flamelab.gameserver.services;
 
-public interface UnitsService {
+public interface ScoreService {
 }

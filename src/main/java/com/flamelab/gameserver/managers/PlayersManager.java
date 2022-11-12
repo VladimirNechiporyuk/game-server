@@ -4,6 +4,7 @@ import com.flamelab.gameserver.dtos.create.CreatePlayerDto;
 import com.flamelab.gameserver.dtos.transcfer.TransferPlayerDto;
 import com.flamelab.gameserver.dtos.update.UpdatePlayerDto;
 import com.flamelab.gameserver.entities.Player;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,11 +13,11 @@ public interface PlayersManager {
 
     TransferPlayerDto createPlayer(CreatePlayerDto createPlayerDto);
 
-    TransferPlayerDto getPlayerById(UUID playerId);
+    TransferPlayerDto getPlayerById(ObjectId playerId);
 
     List<TransferPlayerDto> getAllPlayers();
 
-    TransferPlayerDto updatePlayerById(UUID playerId, UpdatePlayerDto updatePlayerDto);
+    TransferPlayerDto updatePlayerById(ObjectId playerId, UpdatePlayerDto updatePlayerDto);
 
-    void deletePlayerById(UUID playerId);
+    void deletePlayerById(ObjectId playerId);
 }

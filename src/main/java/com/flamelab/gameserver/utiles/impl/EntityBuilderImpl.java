@@ -5,6 +5,7 @@ import com.flamelab.gameserver.entities.CommonEntity;
 import com.flamelab.gameserver.exceptions.EntityDoesNotCreatedException;
 import com.flamelab.gameserver.utiles.EntityBuilder;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -46,8 +47,9 @@ public class EntityBuilderImpl<E extends CommonEntity, D extends CommonCreateDto
     }
 
     private void setCommonEntityValues(E instance) {
-//        instance.setId(UUID.randomUUID());
+        instance.setId(ObjectId.get());
         instance.setCreatedDate(LocalDateTime.now());
+        instance.setLastUpdatedDate(LocalDateTime.now());
     }
 
 }

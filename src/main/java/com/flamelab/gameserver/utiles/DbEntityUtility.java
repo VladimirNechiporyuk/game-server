@@ -19,6 +19,8 @@ public interface DbEntityUtility <E extends CommonEntity> {
 
     E findOneBy(Map<FieldNames, Object> criterias, Class<E> searchedClass, DbCollectionNames dbCollectionName);
 
+    E findOneById(ObjectId id, Class<E> searchedClass, DbCollectionNames dbCollectionName);
+
     List<E> findAllBy(Map<FieldNames, Object> criterias, Class<E> searchedClass, DbCollectionNames dbCollectionName);
 
     List<E> findAllWhichContainsAnyOfCriteria(Map<FieldNames, Object> criterias, List<Class<E>> searchedClasses, DbCollectionNames dbCollectionName);
@@ -35,8 +37,8 @@ public interface DbEntityUtility <E extends CommonEntity> {
 
     boolean isDbEntityListParameterContainsValue(ObjectId entityId, FieldNames entityFieldListName, Object searchedValue, Class<E> targetClass, DbCollectionNames dbCollectionName);
 
-    void deleteAllFromDbByIds(List<ObjectId> ids, Class<E> searchedClass, DbCollectionNames collectionName);
-
     boolean isEntityExistsBy(Map<FieldNames, Object> criterias, Class<E> targetClass, DbCollectionNames dbCollectionName);
+
+    void deleteEntityBy(Map<FieldNames, Object> criterias, Class<E> targetClass, DbCollectionNames dbCollectionName);
 
 }
