@@ -23,10 +23,14 @@ public enum FieldNames {
     CAVALRYMAN_IN_HAVY_ARMOR__FIELD_APPELLATION("cavalrymanInHavyArmors"),
     BOWMANS__FIELD_APPELLATION("bowmans");
 
-    private final String name;
+    private final String field;
 
-    FieldNames(String name) {
-        this.name = name;
+    public String getField() {
+        return field;
+    }
+
+    FieldNames(String field) {
+        this.field = field;
     }
 
     public static FieldNames getFieldAppellationByName(String name) {

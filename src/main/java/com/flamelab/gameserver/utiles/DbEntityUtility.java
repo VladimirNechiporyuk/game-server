@@ -31,7 +31,7 @@ public interface DbEntityUtility <E extends CommonEntity> {
 
     List<E> findAllInCollection(List<Class<E>> entityClassList, DbCollectionNames dbCollectionName);
 
-    E updateEntity(E entity, Class<E> entityClass, Map<FieldNames, Object> fieldsWithNewData, DbCollectionNames collectionName);
+    E updateEntity(E entity, Class<E> entityClass, Map<FieldNames, Object> fieldsWithNewData, DbCollectionNames dbCollectionName);
 
     E updateOneFieldForEntity(Map<FieldNames, Object> criterias, FieldNames fieldName, Object updatedValue, Class<E> entityClass, DbCollectionNames collectionName);
 

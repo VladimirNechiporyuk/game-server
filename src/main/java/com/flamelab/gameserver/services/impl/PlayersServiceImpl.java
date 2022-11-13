@@ -49,8 +49,7 @@ public class PlayersServiceImpl implements PlayersService {
     @Override
     public TransferPlayerDto getEntityById(ObjectId id) {
         return mapperFromEntityToTransferDto.map(
-                fetchPlayerById(id),
-//                fetchPlayerByOrThrow(Map.of(ID__FIELD_APPELLATION, id)),
+                fetchPlayerByOrThrow(Map.of(ID__FIELD_APPELLATION, id)),
                 Player.class,
                 TransferPlayerDto.class
         );
@@ -72,10 +71,8 @@ public class PlayersServiceImpl implements PlayersService {
 
     @Override
     public TransferPlayerDto updateEntityById(ObjectId id, UpdatePlayerDto updatedDto) {
-        Player existingPlayer = fetchPlayerById(id);
-        Player playerWithNewData = mapperFromUpdateDtoToEntity.map(updatedDto, UpdatePlayerDto.class, Player.class);
         return mapperFromEntityToTransferDto.map(
-                updateProjectData(existingPlayer, playerWithNewData),
+                updateEntityBy(Map.of(ID__FIELD_APPELLATION, id), updatedDto),
                 Player.class,
                 TransferPlayerDto.class);
     }
@@ -98,19 +95,16 @@ public class PlayersServiceImpl implements PlayersService {
         return dbEntityUtility.findOneById(id, Player.class, PLAYERS__DB_COLLECTION);
     }
 
-    private TransferPlayerDto updateEntityBy(Map<FieldNames, Object> criterias, UpdatePlayerDto updatedDto) {
-        Player existingProject = fetchPlayerByOrThrow(criterias);
-        Player projectWithNewData = mapperFromUpdateDtoToEntity.map(updatedDto, UpdatePlayerDto.class, Player.class);
-        return mapperFromEntityToTransferDto.map(
-                updateProjectData(existingProject, projectWithNewData),
-                Player.class,
-                TransferPlayerDto.class);
+    private Player updateEntityBy(Map<FieldNames, Object> criterias, UpdatePlayerDto updatedDto) {
+        Player existingPlayer = fetchPlayerByOrThrow(criterias);
+        Player playerWithNewData = mapperFromUpdateDtoToEntity.map(updatedDto, UpdatePlayerDto.class, Player.class);
+        return updatePlayerData(existingPlayer, playerWithNewData);
     }
 
-    private Player updateProjectData(Player projectForUpdate, Player projectWithNewData) {
-        Map<FieldNames, Object> fieldsWithNewData = differenceUtility.getChanges(projectForUpdate, projectWithNewData, Player.class);
+    private Player updatePlayerData(Player playerForUpdate, Player playerWithNewData) {
+        Map<FieldNames, Object> fieldsWithNewData = differenceUtility.getChanges(playerForUpdate, playerWithNewData, Player.class);
         return dbEntityUtility.updateEntity(
-                projectForUpdate,
+                playerForUpdate,
                 Player.class,
                 fieldsWithNewData,
                 PLAYERS__DB_COLLECTION);

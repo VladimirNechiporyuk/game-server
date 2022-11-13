@@ -117,19 +117,6 @@ public class MongoDbEntityUtilityImpl<E extends CommonEntity> implements DbEntit
         return mongoTemplate.save(entity, dbCollectionName.name());
     }
 
-//    public E updateEntity(Map<String, Object> criterias, Map<String, Object> fieldsWithNewData, Class<E> entityClass, String collectionName) {
-//        Update updateRequest = new Update();
-//        for (Map.Entry<String, Object> fieldWithValue : fieldsWithNewData.entrySet()) {
-//            updateRequest.addToSet(fieldWithValue.getKey(), fieldWithValue.getValue());
-//        }
-//        return mongoTemplate.findAndModify(
-//                buildQuery(criterias),
-//                updateRequest,
-//                FindAndModifyOptions.options().upsert(true),
-//                entityClass,
-//                collectionName);
-//    }
-
     public E updateOneFieldForEntity(Map<FieldNames, Object> criterias, FieldNames fieldName, Object updatedValue, Class<E> entityClass, DbCollectionNames collectionName) {
         Update updateRequest = new Update();
         updateRequest.addToSet(fieldName.name(), updatedValue);
@@ -187,7 +174,7 @@ public class MongoDbEntityUtilityImpl<E extends CommonEntity> implements DbEntit
                 List<Object> values = Arrays.asList(String.valueOf(entry.getValue()).split(separateSymbol));
                 values.forEach(value -> addCriteria(entry.getKey(), value, query));
             }
-            query.addCriteria(Criteria.where(String.valueOf(entry.getKey())).is(entry.getValue()));
+            query.addCriteria(Criteria.where(entry.getKey().getField()).is(entry.getValue()));
         }
         return query;
     }
@@ -206,25 +193,25 @@ public class MongoDbEntityUtilityImpl<E extends CommonEntity> implements DbEntit
                             values.forEach(value -> addCriteriaAndAnyValueFromLeftSide(entry.getKey(), value, query));
                 }
             }
-            query.addCriteria(Criteria.where(String.valueOf(entry.getKey())).is(entry.getValue()));
+            query.addCriteria(Criteria.where(String.valueOf(entry.getKey().getField())).is(entry.getValue()));
         }
         return query;
     }
 
     private void addCriteria(FieldNames fieldName, Object value, Query query) {
-        query.addCriteria(Criteria.where(fieldName.name()).is(value));
+        query.addCriteria(Criteria.where(fieldName.getField()).is(value));
     }
 
     private void addCriteriaAndAnyValueFromBothSides(FieldNames fieldName, Object value, Query query) {
-        query.addCriteria(Criteria.where(fieldName.name()).is("/" + value + "/"));
+        query.addCriteria(Criteria.where(fieldName.getField()).is("/" + value + "/"));
     }
 
     private void addCriteriaAndAnyValueFromRightSide(FieldNames fieldName, Object value, Query query) {
-        query.addCriteria(Criteria.where(fieldName.name()).is("^" + value + "/"));
+        query.addCriteria(Criteria.where(fieldName.getField()).is("^" + value + "/"));
     }
 
     private void addCriteriaAndAnyValueFromLeftSide(FieldNames fiendName, Object value, Query query) {
-        query.addCriteria(Criteria.where(fiendName.name()).is("/" + value + "$"));
+        query.addCriteria(Criteria.where(fiendName.getField()).is("/" + value + "$"));
     }
 
 }
