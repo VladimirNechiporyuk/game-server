@@ -34,12 +34,12 @@ public class PlayersController {
         return playersManager.getAllPlayers();
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public TransferPlayerDto updatePlayer(@PathVariable("id") ObjectId playerId, @RequestBody UpdatePlayerDto updatePlayerDto) {
         return playersManager.updatePlayerById(playerId, updatePlayerDto);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public void deletePlayer(@PathVariable("id") ObjectId playerId) {
         playersManager.deletePlayerById(playerId);
     }

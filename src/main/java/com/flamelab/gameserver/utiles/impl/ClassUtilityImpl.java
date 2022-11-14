@@ -113,10 +113,13 @@ public class ClassUtilityImpl<T extends ObjectWithData> implements ClassUtility<
     @Override
     public T setValuesForFields(T instance, Class<T> targetClass, Map<FieldNames, Object> fieldsWithValues) {
         List<Field> fields = getAllClassFields(targetClass).stream().peek(f -> f.setAccessible(true)).toList();
+        Map<String, Object> fieldsStringsWithValues = fieldsWithValues.entrySet()
+                .stream()
+                .collect(Collectors.toMap(fieldName -> fieldName.getKey().getField(), Map.Entry::getValue));
         for (Field field : fields) {
             try {
-                if (fieldsWithValues.containsKey(field.getName())) {
-                    field.set(instance, fieldsWithValues.get(field.getName()));
+                if (fieldsStringsWithValues.containsKey(field.getName())) {
+                    field.set(instance, fieldsStringsWithValues.get(field.getName()));
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
